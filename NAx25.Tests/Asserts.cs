@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using System.Collections;
+using System.Linq;
 
 namespace NAx25.Tests
 {
@@ -17,6 +18,8 @@ namespace NAx25.Tests
             frame.ControlFields.SendSequenceNumber.Should().Be(0);
             frame.ControlFields.SupervisoryControlFieldType.Should().BeNull();
             frame.InformationFrameFields.ProtocolId.Should().Be(Protocol.NoLayer3Protocol);
+            frame.SourceAddresses.Take(frame.SourceAddresses.Count - 1).Select(f => f.IsLastAddress).Should().AllBeEquivalentTo(false);
+            frame.SourceAddresses[^1].IsLastAddress.Should().BeTrue();
         }
     }
 }
