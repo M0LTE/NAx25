@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NAx25", "NAx25\NAx25.csproj", "{FD45C661-8E05-47AE-8EF2-B265E553F2E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NAx25.Tests", "NAx25.Tests\NAx25.Tests.csproj", "{F8DAAE30-1EC8-492D-BB30-416D888C1C87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NAx25.Tests", "NAx25.Tests\NAx25.Tests.csproj", "{F8DAAE30-1EC8-492D-BB30-416D888C1C87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KissListener", "KissListener\KissListener.csproj", "{FDC5D495-F6ED-43C3-86DE-D6D25FE826AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F8DAAE30-1EC8-492D-BB30-416D888C1C87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8DAAE30-1EC8-492D-BB30-416D888C1C87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8DAAE30-1EC8-492D-BB30-416D888C1C87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDC5D495-F6ED-43C3-86DE-D6D25FE826AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDC5D495-F6ED-43C3-86DE-D6D25FE826AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDC5D495-F6ED-43C3-86DE-D6D25FE826AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDC5D495-F6ED-43C3-86DE-D6D25FE826AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

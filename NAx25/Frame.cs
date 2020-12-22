@@ -1,76 +1,103 @@
-﻿using System;
+﻿using MoreLinq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace NAx25
 {
-    public class ControlFields
-    {
-        public BitArray MBits { get; internal set; }
-        public bool PFBit { get; internal set; }
-    }
-
     public class Frame
     {
         /// <summary>
         /// http://nic.vajn.icu/PDF/ham/AX25/ax25.html#2.2.13
         /// </summary>
-        public byte[] AddressBytes { get; set; }
+        public byte[] AddressFieldBytes { get; set; }
 
         /// <summary>
         /// http://nic.vajn.icu/PDF/ham/AX25/ax25.html#2.3.2.1
         /// </summary>
         public byte ControlByte { get; set; }
 
-        public ControlFields ControlFields { get => Decoding.DecodeControlByte(ControlByte); }
-
-        private void SetControlFields(byte value)
-        {
-            throw new NotImplementedException();
-        }
+        public ControlFields ControlFields => Decoding.DecodeControlByte(ControlByte);
 
         public InformationFrameFields InformationFrameFields { get; set; }
+        public SupervisoryFrameFields SupervisoryFrameFields { get; set; }
 
+        /// <summary>
+        /// http://practicingelectronics.com/articles/article-100003/article.php
+        /// </summary>
         public UInt16 FcsField { get; set; }
 
         public FrameType FrameType { get; set; }
 
-        public DestinationField DestinationAddress { get; }
-        public ICollection<SourceField> SourceAddresses { get; set; }
+        public AddressField DestinationAddress => new AddressField(AddressFieldBytes.Take(7).ToArray());
+        public IList<AddressField> SourceAddresses => AddressFieldBytes.Skip(7).Batch(7).Select(addressBytes => new AddressField(addressBytes.ToArray())).ToList();
 
-        public SFrameType? SFrameType { get; set; }
-
-        public Frame(byte[] data)
+        public static bool TryParse(byte[] data, out Frame frame)
         {
-            var frameWithoutFlags = data.Where(b => b != 0x7e).ToArray();
+            var frameWithoutFlags = RemoveFlags(data);
 
             byte[] theRest;
-            (AddressBytes, theRest) = Decoding.ConsumeAddressField(frameWithoutFlags);
-            (ControlByte, theRest) = Decoding.ConsumeByte(theRest);
-            FrameType = GetFrameType(ControlByte);
+            var result = new Frame();
+            (result.AddressFieldBytes, theRest) = Decoding.ConsumeAddressField(frameWithoutFlags);
+            (result.ControlByte, theRest) = Decoding.ConsumeByte(theRest);
+            result.FrameType = GetFrameType(result.ControlByte);
 
-            if (FrameType == FrameType.Information || FrameType == FrameType.UnnumberedInformation)
+            if (result.FrameType == FrameType.Information || result.FrameType == FrameType.UnnumberedInformation)
             {
-                InformationFrameFields = new InformationFrameFields();
-                (InformationFrameFields.ProtocolIdByte, theRest) = Decoding.ConsumeByte(theRest);
-                (InformationFrameFields.InfoBytes, theRest) = Decoding.ConsumeInfoField(theRest);
+                result.InformationFrameFields = new InformationFrameFields();
+                (result.InformationFrameFields.ProtocolIdByte, theRest) = Decoding.ConsumeByte(theRest);
+                (result.InformationFrameFields.InfoBytes, theRest) = Decoding.ConsumeInformationField(theRest);
+            }
+            else if (result.FrameType == FrameType.Supervisory)
+            {
+                result.SupervisoryFrameFields = new SupervisoryFrameFields();
+                result.SupervisoryFrameFields.SFrameType = GetAx25V2SFrameType(result.AddressFieldBytes);
             }
 
-            if (FrameType == FrameType.Supervisory)
-            {
-                SFrameType = GetAx25V2SFrameType(AddressBytes);
-            }
-
-            (FcsField, theRest) = Decoding.ConsumeFcsField(theRest);
+            (result.FcsField, theRest) = Decoding.ConsumeFcsField(theRest);
 
             if (theRest.Length > 0)
             {
-                throw new Exception("Frame decoding error - excess bytes");
+                throw new Exception($"Frame decoding error - {theRest.Length} excess bytes after FCS field");
             }
+
+            frame = result;
+            return true;
         }
 
-        private SFrameType GetAx25V2SFrameType(byte[] addressBytes)
+        private static byte[] RemoveFlags(byte[] data)
+        {
+            const byte FLAG = 0x7e;
+
+            bool inFrame = false;
+            var frameResult = new List<byte>();
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (!inFrame)
+                {
+                    if (data[i] != FLAG)
+                    {
+                        inFrame = true;
+                        frameResult.Add(data[i]);
+                    }
+                }
+                else
+                {
+                    if (data[i] == FLAG && i == data.Length - 1)
+                    {
+                        return frameResult.ToArray();
+                    }
+
+                    frameResult.Add(data[i]);
+                }
+            }
+
+            return frameResult.ToArray();
+        }
+
+        private static SFrameType GetAx25V2SFrameType(byte[] addressBytes)
         {
             if (addressBytes.Length != 14)
             {
@@ -91,9 +118,9 @@ namespace NAx25
             return NAx25.SFrameType.Response;
         }
 
-        private FrameType GetFrameType(byte control)
+        private static FrameType GetFrameType(byte control)
         {
-            var bitArray = new BitArray(control);
+            var bitArray = new BitArray(new[] { control });
 
             if (bitArray[0] && bitArray[1])
             {
@@ -115,7 +142,46 @@ namespace NAx25
     public class InformationFrameFields
     {
         public byte ProtocolIdByte { get; set; }
+        public Protocol ProtocolId => GetProtocolId(ProtocolIdByte);
+
+        /// <summary>
+        /// http://nic.vajn.icu/PDF/ham/AX25/ax25.html section 2.2.4 PID Field
+        /// </summary>
+        private static Protocol GetProtocolId(byte pidByte)
+        {
+            var ba = new BitArray(pidByte);
+
+            if (ba[5] != ba[4])
+            {
+                return Protocol.Ax25Layer3Implemented;
+            }
+
+            return pidByte switch
+            {
+                0x01 => Protocol.Iso8202_CcittX25Plp,
+                0x08 => Protocol.SegmentationFragment,
+                0xc3 => Protocol.TexnetDatagramProtocol,
+                0xc4 => Protocol.LinkQualityProtocol,
+                0xca => Protocol.Appletalk,
+                0xcb => Protocol.AppletalkArp,
+                0xcc => Protocol.ArpaInternetProtocol,
+                0xcd => Protocol.ArpaAddressResolution,
+                0xcf => Protocol.NetRom,
+                0xf0 => Protocol.NoLayer3Protocol,
+                0xff => throw new ArgumentException("Escape PID not supported"),
+                _ => throw new ArgumentException($"Unknown protocol id {pidByte.ToHexByte()}"),
+            };
+        }
+
         public byte[] InfoBytes { get; set; }
+        public string InfoText => Encoding.ASCII.GetString(InfoBytes);
+
+        public override string ToString() => InfoText;
+    }
+
+    public class SupervisoryFrameFields
+    {
+        public SFrameType SFrameType { get; set; }
     }
 
     public enum SFrameType
@@ -126,5 +192,20 @@ namespace NAx25
     public enum FrameType
     {
         UnnumberedInformation, Information, Supervisory
+    }
+
+    public enum Protocol
+    {
+        Iso8202_CcittX25Plp,
+        SegmentationFragment,
+        Ax25Layer3Implemented,
+        TexnetDatagramProtocol,
+        LinkQualityProtocol,
+        Appletalk,
+        AppletalkArp,
+        ArpaInternetProtocol,
+        ArpaAddressResolution,
+        NetRom,
+        NoLayer3Protocol,
     }
 }
