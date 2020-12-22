@@ -16,7 +16,7 @@ namespace NAx25.Tests
             frame.ControlFields.ReceiveSequenceNumber.Should().Be(0);
             frame.ControlFields.SendSequenceNumber.Should().Be(0);
             frame.ControlFields.SupervisoryControlFieldType.Should().BeNull();
-            frame.InformationFrameFields.ProtocolIdByte.Should().Be(0xf0);
+            frame.InformationFrameFields.ProtocolId.Should().Be(Protocol.NoLayer3Protocol);
         }
     }
 }

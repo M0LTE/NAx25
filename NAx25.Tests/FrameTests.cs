@@ -58,7 +58,7 @@ namespace NAx25.Tests
             iframe.ControlFields.SendSequenceNumber.Should().Be(7);
             iframe.FrameType.Should().Be(FrameType.Information); // The frame shown is an I frame, 
             iframe.InformationFrameFields.Should().NotBeNull();
-            iframe.InformationFrameFields.ProtocolIdByte.Should().Be(0xf0); //  with no level 3 protocol. 
+            iframe.InformationFrameFields.ProtocolId.Should().Be(Protocol.NoLayer3Protocol); //  with no level 3 protocol. 
             iframe.InformationFrameFields.InfoBytes.Should().BeEmpty();
             iframe.FcsField.Should().Be(0);
 
