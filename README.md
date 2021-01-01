@@ -1,5 +1,5 @@
 # NAx25
-Cleanroom .NET Standard implementation of AX.25. Very much work-in-progress.
+From-scratch .NET Standard implementation of AX.25. Very much work-in-progress.
 
 # Aims
 - learning experience for the author
