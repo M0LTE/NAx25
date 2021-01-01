@@ -12,7 +12,7 @@ Cleanroom .NET Standard implementation of AX.25. Very much work-in-progress.
 # Status
 - frame encoding and decoding basically works now, and the public API is fairly clean
 - KISS framing is implemented in both directions, with proper handling of escaping
-- FCS calculation isn't implemented :cry:
+- FCS calculation isn't implemented :cry: (#1)
 - a larger test suite needs assembling which covers a larger variety of the possible valid types of frame
 - issues and contributions very welcome, please go ahead and use the GitHub tooling
 
