@@ -92,3 +92,29 @@ public void Unframe_SendHelloOnTncPort5()
     commandCode.Should().Be(KissCommandCode.DataFrame);
 }
 ```
+
+# References:
+David Arthur (TARPN):  
+You should be able to use this project to generate any kind of AX.25 packet (with or without KISS framing):  
+https://github.com/tarpn/tarpn-node-controller/tree/master/tarpn/ax25  
+
+John Langner WB2OSZ (Dire Wolf):  
+There are a few different revisions of the AX.25 v2.2 protocol specification floating around.  
+https://www.tapr.org/pdf/AX25.2.2.pdf  
+http://www.ax25.net/AX25.2.2-Jul%2098-2.pdf  
+http://www.nj7p.org/AX.25%20Review/AX25.2.2-Sep%2017-1-10Sep17.pdf  
+
+The first is the original from 1998.  
+The second one has the figures redone and some errors corrected in 2006.  
+The third incorporates additional feedback from those who have implemented it in recent years.  
+
+A working implementation can be found here:  
+https://github.com/wb2osz/direwolf/blob/master/src/ax25_link.c  
+ 
+This should help you understand some of the improvements in the v2.2 (1998) version which were not in the v2.0 (1984) version:  
+https://github.com/wb2osz/direwolf/blob/master/doc/Why-is-9600-only-twice-as-fast-as-1200.pdf  
+
+John Wiseman G8BPQ (BPQ32):  
+Just be aware that very few software modems and virtually no hardware TNCs implement ax.25 V 2.2  
+And those that do don't always agree on what the spec actually means. In particular there seem to be some who believe that Extended Mode (ie SABME) and V2.2 are synonymous.  
+
