@@ -296,9 +296,12 @@ namespace NAx25
 
         public static ushort Crc16Ccitt(byte[] bytes)
         {
-            // https://stackoverflow.com/a/34943214/17971
+            // Required implementation: http://practicingelectronics.com/articles/article-100003/article.php
 
-            // this doesn't seem to match the AX.25 way of doing it
+            // something I found: https://stackoverflow.com/a/34943214/17971
+            
+            // but this doesn't seem to match the AX.25 way of doing it
+            // and I don't know what I'm doing
 
             const ushort poly = 0x1021; // 4129
             ushort[] table = new ushort[256];
