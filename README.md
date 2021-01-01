@@ -94,6 +94,8 @@ public void Unframe_SendHelloOnTncPort5()
 ```
 
 # References:
+Protocol spec: http://nic.vajn.icu/PDF/ham/AX25/ax25.html
+
 David Arthur (TARPN):  
 You should be able to use this project to generate any kind of AX.25 packet (with or without KISS framing):  
 https://github.com/tarpn/tarpn-node-controller/tree/master/tarpn/ax25  
