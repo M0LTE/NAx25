@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 
 namespace NAx25
 {
@@ -8,7 +9,12 @@ namespace NAx25
         /// The "M" bits are the unnumbered frame modifier bits and their encoding is discussed in 2.3.4.3.
         /// Only present in U frames, there will always be 5 bits.
         /// </summary>
-        public BitArray ModifierBits { get; set; }
+        //public BitArray ModifierBits { get; set; }
+        public bool M7 { get; set; }
+        public bool M6 { get; set; }
+        public bool M5 { get; set; }
+        public bool M3 { get; set; }
+        public bool M2 { get; set; }
 
         /// <summary>
         /// The P/F bit is the Poll/Final bit. Its function is described in 2.3.3. The distinction between 
@@ -34,5 +40,23 @@ namespace NAx25
         /// http://nic.vajn.icu/PDF/ham/AX25/ax25.html 2.3.4.2 Supervisory Frame Control Field
         /// </summary>
         public SupervisoryControlFieldType? SupervisoryControlFieldType { get; set; }
+    }
+
+    public enum SupervisoryControlFieldType
+    {
+        /// <summary>
+        /// RR, 00
+        /// </summary>
+        ReceiveReady,
+
+        /// <summary>
+        /// RNR, 01
+        /// </summary>
+        ReceiveNotReady,
+
+        /// <summary>
+        /// REJ, 10
+        /// </summary>
+        Reject
     }
 }

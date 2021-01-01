@@ -42,7 +42,7 @@ namespace NAx25.Tests
             frame.SourceAddresses[4].IsLastAddress.Should().BeTrue();
             frame.SourceAddresses.Select(a => a.Ssid).Should().AllBeEquivalentTo(0);
 
-            frame.FcsField.Should().Be(3379); // not verified
+            frame.Fcs.Should().Be(3379); // not verified
             frame.InformationFrameFields.ProtocolId.Should().Be(Protocol.NoLayer3Protocol);
             frame.InformationFrameFields.InfoText.Should().Be(";EL-g0wyg *221432z5125.65NE00000.69E0000000/103 On  @1432 7");
         }

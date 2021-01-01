@@ -102,9 +102,9 @@ namespace NAx25.Tests
         {
             if (buffer.Length > 2 && buffer[0] == 0xc0 && buffer[1] == 0x00 && buffer[^1] == 0xc0)
             {
-                var (ax25Data, fromModemPort, commandCode) = Kiss.Unkiss(buffer);
+                var (ax25Data, fromModemPort, commandCode) = KissFraming.Unkiss(buffer);
 
-                if (commandCode != Kiss.CommandCode.DataFrame)
+                if (commandCode != KissCommandCode.DataFrame)
                 {
                     throw new Exception($"Received a {commandCode} from the modem which is not valid");
                 }
