@@ -302,8 +302,8 @@ namespace NAx25
 
             const ushort poly = 0x1021; // 4129
             ushort[] table = new ushort[256];
-            ushort initialValue = 0x1d0f; // from SO comment;
-            //ushort initialValue = 0xffff; //original
+            //ushort initialValue = 0x1d0f; // from SO comment;
+            ushort initialValue = 0xffff; //original
             ushort temp, a;
             ushort crc = initialValue;
 

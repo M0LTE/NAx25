@@ -1,8 +1,4 @@
 ﻿using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Xunit;
 
 namespace NAx25.Tests
@@ -12,19 +8,15 @@ namespace NAx25.Tests
         [Fact]
         public void Fcs()
         {
-            var asciiValues = Enumerable.Range('1', 9).Select(e => (byte)e).Select(b => ReverseBytes(b)).ToArray();
+            byte[] asciiValues = new[] { (byte)'1', (byte)'2', (byte)'3', (byte)'4', (byte)'5', (byte)'6', (byte)'7', (byte)'8', (byte)'9', };
 
-            var fcs = FieldDecoding.Crc16Ccitt(asciiValues);
+            ushort fcs = FieldDecoding.Crc16Ccitt(asciiValues);
 
-            //fcs.Should().Be(0x906e);
-            //fcs.Should().Be(0x7609);
-        }
+            // expected result:
+            // 01110110 00001001
+            // 0x76     0x09
 
-        public static byte ReverseBytes(byte value)
-        {
-            //return value;
-            var lNewVal = (byte)((((ulong)value * 0x0202020202UL) & 0x010884422010UL) % 1023);
-            return lNewVal;
+            fcs.Should().Be(0x7609);
         }
     }
 }
